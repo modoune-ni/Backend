@@ -15,25 +15,33 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  bio: {               // <-- ajout du champ bio
+    type: String,
+    default: ''
+  },
   createDAt: {
     type: Date,
     default: Date.now
   },
-},
+}, { timestamps: true });
 
-    { timestamps: true}
-);
+//  Middleware pour hasher le mot de passe avant save
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
-userSchema.pre('save', async function(next) {
-  if (this.isModified('password')) return next();
-    try {
-      const salt = await bcrypt.genSalt(10);
-      this.password = await bcrypt.hash(this.password, salt);
-    } catch (error) {
-      next(error);
-    }
-   
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();  // tu avais raison, il fallait bien appeler next()
+  } catch (error) {
+    next(error);
+  }
 });
+
+//  Méthode pour comparer le mot de passe
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
