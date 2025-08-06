@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+
+  avatar: {            // <-- ajout du champ avatar
+    type: String,      // URL de l'image ou chemin local
+    default: ''
+  }
 }, { timestamps: true });
 
 //  Middleware pour hasher le mot de passe avant save

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 //  CORRECTION : C majuscule dans le nom du fichier
-const authController = require('../controllers/authcontrollers');
+const authController = require('../controllers/authController');
 
 //  Middleware de protection (à créer si pas encore fait)
 const { protect } = require('../middleware/authMiddleware');

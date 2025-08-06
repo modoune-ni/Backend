@@ -178,5 +178,32 @@ exports.deleteArticle = async (req, res) => {
   }
 };
 
+// ✅ Mettre à jour l'avatar
+exports.updateAvatar = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Aucun fichier envoyé' });
+    }
+
+    user.avatar = `/uploads/avatars/${req.file.filename}`;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Avatar mis à jour avec succès',
+      user,
+    });
+  } catch (err) {
+    console.error('Erreur updateAvatar:', err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+};
+
+
 
 
