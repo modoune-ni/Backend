@@ -1,11 +1,15 @@
-// const Comment = require('../models/Comment');
+const Comment = require('../models/Comment');
 const Article = require('../models/Article');
 
 // ✅ Ajouter un commentaire à un article
 exports.addComment = async (req, res) => {
   try {
-    const { content } = req.body;
+    const { text } = req.body; // 🟢 Récupère le commentaire (champ "text" attendu)
     const articleId = req.params.articleId;
+
+    if (!text) {
+      return res.status(400).json({ message: "Le champ 'text' est requis." });
+    }
 
     // Vérifie que l'article existe
     const article = await Article.findById(articleId);
@@ -15,7 +19,7 @@ exports.addComment = async (req, res) => {
 
     // Crée le commentaire
     const comment = new Comment({
-      content,
+      text,
       article: articleId,
       author: req.user._id
     });
@@ -35,7 +39,7 @@ exports.getArticleComments = async (req, res) => {
 
     const comments = await Comment.find({ article: articleId })
       .populate('author', 'name email')  // Affiche nom + email de l'auteur
-      .sort({ createdAt: -1 });          // Commentaires les plus récents en premier
+      .sort({ createdAt: -1 });          // Commentaires les plus récents
 
     res.status(200).json(comments);
   } catch (error) {
@@ -43,7 +47,7 @@ exports.getArticleComments = async (req, res) => {
   }
 };
 
-// ✅ (Optionnel) Supprimer un commentaire (par son auteur uniquement)
+// ✅ Supprimer un commentaire
 exports.deleteComment = async (req, res) => {
   try {
     const commentId = req.params.commentId;
